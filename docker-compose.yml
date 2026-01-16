@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  jellyfin-playlist-creator:
+    build: .
+    image: jellyfin-playlist-creator:latest
+    container_name: jellyfin-playlist-creator
+    # Override entrypoint to keep container running for interactive use
+    # Remove this line if you want to run one-off commands
+    entrypoint: /bin/bash
+    stdin_open: true
+    tty: true
+    env_file:
+      - .env
+    volumes:
+      - .:/app
