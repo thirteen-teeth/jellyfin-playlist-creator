@@ -198,3 +198,62 @@ When using `--output`, the script returns JSON with:
 - The script searches across your entire Jellyfin library
 - Search terms are case-insensitive
 - Playlists are created immediately and can be viewed in your Jellyfin client
+
+---
+
+## Tag Current Video (`tag-current-video.sh`)
+
+A Bash script that lets you quickly apply custom tags to the video currently playing in Jellyfin, without leaving your terminal.
+
+### What it does
+
+1. Queries Jellyfin's `/Sessions` endpoint to find what you are currently playing.
+2. Fetches the full metadata for that item via `/Items/{id}`.
+3. Appends your supplied tags to the item's existing tags, skipping any duplicates.
+4. Pushes the updated metadata back to Jellyfin via `POST /Items/{id}`.
+5. Prints a confirmation summary.
+
+### Prerequisites
+
+- [`curl`](https://curl.se/) — for making HTTP requests to the Jellyfin API
+- [`jq`](https://stedolan.github.io/jq/) — for parsing and transforming JSON
+
+### Configuration
+
+Set the following environment variables (or export them in your shell profile):
+
+| Variable | Default | Description |
+|---|---|---|
+| `JELLYFIN_URL` | `http://localhost:8096` | Base URL of your Jellyfin server |
+| `JELLYFIN_API_KEY` | *(required)* | API key from Dashboard → API Keys |
+| `JELLYFIN_USER_ID` | *(required)* | User ID from Dashboard → Users → click user → ID in URL |
+
+```bash
+export JELLYFIN_URL="http://localhost:8096"
+export JELLYFIN_API_KEY="your-api-key-here"
+export JELLYFIN_USER_ID="your-user-id-here"
+```
+
+### Usage
+
+```bash
+./tag-current-video.sh <tag1> [tag2] [tag3] ...
+```
+
+Tags that contain spaces must be quoted:
+
+```bash
+./tag-current-video.sh "big cat" dog pickle
+```
+
+#### Examples
+
+```bash
+# Tag the currently playing video with three tags
+./tag-current-video.sh cat dog pickle
+# ✅ Tagged "Funny Clip 42" with: 'cat' 'dog' 'pickle'
+
+# Tag with multi-word tags
+./tag-current-video.sh "cute animals" funny outdoor
+# ✅ Tagged "Garden Video" with: 'cute animals' 'funny' 'outdoor'
+```
